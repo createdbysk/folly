@@ -127,6 +127,13 @@ if (PYTHON_EXTENSIONS)
     FILES_MATCHING
       PATTERN "*.h"
   )
+  # Install Cython .pxd files for downstream projects (thrift-python needs these)
+  install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/
+    DESTINATION ${INCLUDE_INSTALL_DIR}/folly
+    FILES_MATCHING
+      PATTERN "*.pxd"
+  )
 
   add_custom_command(TARGET folly_python_bindings
     COMMAND ${CMAKE_COMMAND} -E env
