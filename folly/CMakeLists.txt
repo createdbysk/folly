@@ -127,10 +127,13 @@ if (PYTHON_EXTENSIONS)
     FILES_MATCHING
       PATTERN "*.h"
   )
-  # Install Cython .pxd files for downstream projects (thrift-python needs these)
+  # Install .pxd files for downstream Cython code that imports folly
+  # (e.g., thrift uses "from folly.iobuf cimport IOBuf").
+  # Flatten python/ subdirectory to match Cython's import structure:
+  # folly/python/iobuf.pxd -> include/folly/iobuf.pxd
   install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/
-    DESTINATION ${INCLUDE_INSTALL_DIR}/folly
+    DESTINATION ${INCLUDE_INSTALL_DIR}/folly/
     FILES_MATCHING
       PATTERN "*.pxd"
   )
