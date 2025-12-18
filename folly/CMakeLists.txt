@@ -74,10 +74,10 @@ if (PYTHON_EXTENSIONS)
   cmake_path(REMOVE_FILENAME glog_lib)
   set(libs "-L${CMAKE_BINARY_DIR}:${glog_lib}")
 
-  # Generate API headers by cythonizing .pyx files (no linking yet)
+  # Generate API headers only (no linking)
   add_custom_command(
     OUTPUT ${_cybld}/folly/iobuf_api.h
-    COMMAND python3 -c "from Cython.Build import cythonize\; cythonize(['folly/executor.pyx', 'folly/iobuf.pyx'], compiler_directives={'language_level': 3})"
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py --api-only
     DEPENDS create_binding_symlink
     WORKING_DIRECTORY ${_cybld}
   )
