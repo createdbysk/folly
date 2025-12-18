@@ -29,12 +29,12 @@ exts = [
     Extension(
         "folly.executor",
         sources=["folly/executor.pyx", "folly/ProactorExecutor.cpp"],
-        libraries=["folly", "glog"],
+        libraries=["folly_python_cpp", "folly", "glog"],
     ),
     Extension(
         "folly.iobuf",
         sources=["folly/iobuf.pyx", "folly/iobuf_ext.cpp"],
-        libraries=["folly", "glog"],
+        libraries=["folly_python_cpp", "folly", "glog"],
     ),
 ]
 
