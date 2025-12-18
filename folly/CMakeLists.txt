@@ -74,11 +74,9 @@ if (PYTHON_EXTENSIONS)
   cmake_path(REMOVE_FILENAME glog_lib)
   set(libs "-L${CMAKE_BINARY_DIR}:${glog_lib}")
 
-  add_custom_target(folly_python_bindings ALL
-    DEPENDS folly_python_cpp create_binding_symlink
-    WORKING_DIRECTORY ${_cybld})
-
-  add_custom_command(TARGET folly_python_bindings POST_BUILD
+  # Generate API headers first
+  add_custom_command(
+    OUTPUT ${_cybld}/folly/iobuf_api.h
     COMMAND ${CMAKE_COMMAND} -E env
       "CFLAGS=${CMAKE_C_FLAGS}"
       "CXXFLAGS=${CMAKE_CXX_FLAGS}"
@@ -86,19 +84,26 @@ if (PYTHON_EXTENSIONS)
       "CXX=${CMAKE_CXX_COMPILER}"
       python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py
       build_ext -f ${incs} ${libs}
-    BYPRODUCTS
-      ${_cybld}/folly/iobuf_api.h
+    DEPENDS create_binding_symlink
     WORKING_DIRECTORY ${_cybld}
   )
 
-  add_custom_target(create_post_binding_symlink ALL)
-  add_custom_command(TARGET create_post_binding_symlink
+  add_custom_target(folly_python_api_headers ALL
+    DEPENDS ${_cybld}/folly/iobuf_api.h
+  )
+
+  add_custom_command(
+    OUTPUT ${_cybld}/folly/python/iobuf_api.h
     COMMAND
       ${CMAKE_COMMAND} -E create_symlink
       "${_cybld}/folly/iobuf_api.h"
       "${_cybld}/folly/python/iobuf_api.h"
+    DEPENDS ${_cybld}/folly/iobuf_api.h
   )
 
+  add_custom_target(create_post_binding_symlink ALL
+    DEPENDS ${_cybld}/folly/python/iobuf_api.h
+  )
 
   add_library(
     folly_python_cpp
@@ -116,6 +121,13 @@ if (PYTHON_EXTENSIONS)
   target_include_directories(folly_python_cpp PRIVATE "${_cybld}")
   target_link_libraries(folly_python_cpp PUBLIC folly)
   apply_folly_compile_options_to_target(folly_python_cpp)
+
+  # Build Python extensions (depends on C++ library)
+  add_custom_target(folly_python_bindings ALL
+    DEPENDS folly_python_cpp folly_python_api_headers
+    WORKING_DIRECTORY ${_cybld}
+  )
+
   install(
     TARGETS folly_python_cpp
     EXPORT folly
