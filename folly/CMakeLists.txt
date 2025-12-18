@@ -72,7 +72,7 @@ if (PYTHON_EXTENSIONS)
   set(incs "$<$<BOOL:${prop}>:-I$<JOIN:${prop},:>>")
   set(glog_lib "${GLOG_LIBRARY}")
   cmake_path(REMOVE_FILENAME glog_lib)
-  set(libs "-L${CMAKE_BINARY_DIR}:${glog_lib}")
+  set(libs "-L${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_BINARY_DIR}:${glog_lib}")
 
   # Generate API headers only (no linking)
   add_custom_command(
