@@ -75,7 +75,7 @@ if (PYTHON_EXTENSIONS)
   set(libs "-L${CMAKE_BINARY_DIR}:${glog_lib}")
 
   add_custom_target(folly_python_bindings ALL
-    DEPENDS folly create_binding_symlink
+    DEPENDS folly_python_cpp create_binding_symlink
     WORKING_DIRECTORY ${_cybld})
 
   add_custom_command(TARGET folly_python_bindings POST_BUILD
@@ -110,7 +110,7 @@ if (PYTHON_EXTENSIONS)
 
   target_include_directories(folly_python_cpp PRIVATE ${Python3_INCLUDE_DIRS})
   target_link_libraries(folly_python_cpp PRIVATE Python3::Python)
-  add_dependencies(folly_python_cpp folly_python_bindings create_post_binding_symlink)
+  add_dependencies(folly_python_cpp folly create_post_binding_symlink)
   set_property(TARGET folly_python_cpp PROPERTY VERSION ${PACKAGE_VERSION})
   target_compile_definitions(folly_python_cpp PRIVATE BOOST_NO_AUTO_PTR)
   target_include_directories(folly_python_cpp PRIVATE "${_cybld}")
