@@ -181,23 +181,25 @@ if (PYTHON_EXTENSIONS)
     set(INSTALL_DIR ${PYTHON_PACKAGE_INSTALL_DIR})
   endif()
 
-  # Use pip install instead of deprecated setup.py install.
-  # setup.py install creates eggs (zip archives) which don't work reliably
-  # in custom install directories that don't support .pth files.
-  # pip install extracts files directly to site-packages/folly/, creating
-  # a proper directory structure that Python can import normally.
-  # Using python3 -m pip ensures we use pip from the correct Python installation.
+  # Install the wheel built by bdist_wheel above.
+  # Using pip install on the wheel instead of setup.py install because:
+  # - setup.py install creates eggs (zip archives) which don't work reliably
+  #   in custom install directories that don't support .pth files
+  # - pip install extracts files directly to site-packages/folly/, creating
+  #   a proper directory structure that Python can import normally
   # --no-deps: folly has no Python dependencies
-  # --no-build-isolation: use the current environment (Cython already available)
   install(CODE "
-    execute_process(
-      COMMAND
-        python3 -m pip install ${CMAKE_CURRENT_SOURCE_DIR}/python
-        --prefix ${INSTALL_DIR}
-        --no-deps
-        --no-build-isolation
-      COMMAND_ECHO STDOUT
-      WORKING_DIRECTORY ${_cybld}
-    )"
-  )
+    file(GLOB _folly_wheel \"${_cybld}/dist/folly-*.whl\")
+    if(_folly_wheel)
+      execute_process(
+        COMMAND python3 -m pip install \${_folly_wheel}
+          --prefix ${INSTALL_DIR}
+          --no-deps
+          --force-reinstall
+        COMMAND_ECHO STDOUT
+      )
+    else()
+      message(FATAL_ERROR \"No folly wheel found in ${_cybld}/dist/\")
+    endif()
+  ")
 endif ()
