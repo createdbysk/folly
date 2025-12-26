@@ -181,11 +181,21 @@ if (PYTHON_EXTENSIONS)
     set(INSTALL_DIR ${PYTHON_PACKAGE_INSTALL_DIR})
   endif()
 
+  # Use pip install instead of deprecated setup.py install.
+  # setup.py install creates eggs (zip archives) which don't work reliably
+  # in custom install directories that don't support .pth files.
+  # pip install extracts files directly to site-packages/folly/, creating
+  # a proper directory structure that Python can import normally.
+  # Using python3 -m pip ensures we use pip from the correct Python installation.
+  # --no-deps: folly has no Python dependencies
+  # --no-build-isolation: use the current environment (Cython already available)
   install(CODE "
     execute_process(
       COMMAND
-        python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py install
+        python3 -m pip install ${CMAKE_CURRENT_SOURCE_DIR}/python
         --prefix ${INSTALL_DIR}
+        --no-deps
+        --no-build-isolation
       COMMAND_ECHO STDOUT
       WORKING_DIRECTORY ${_cybld}
     )"
