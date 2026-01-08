@@ -18,6 +18,7 @@
 # Cython requires source files in a specific structure, the structure is
 # created as tree of links to the real source files.
 
+import argparse
 import sys
 
 import Cython
@@ -39,8 +40,6 @@ def parse_build_mode(argv: list) -> tuple:
     Returns:
         Tuple of (is_api_only, remaining_args)
     """
-    import argparse
-
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--api-only", action="store_true")
     args, remaining = parser.parse_known_args(argv[1:])
