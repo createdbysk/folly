@@ -28,7 +28,31 @@ from setuptools import Extension, setup
 
 Options.fast_fail = True
 
-if "--api-only" in sys.argv:
+
+def parse_build_mode(argv: list) -> tuple:
+    """
+    Parse command line arguments to determine build mode.
+
+    Args:
+        argv: Command line arguments (typically sys.argv)
+
+    Returns:
+        Tuple of (is_api_only, remaining_args)
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--api-only", action="store_true")
+    args, remaining = parser.parse_known_args(argv[1:])
+    return args.api_only, [argv[0]] + remaining
+
+
+is_api_only, remaining_argv = parse_build_mode(sys.argv)
+# Restore sys.argv with remaining args so setuptools sees its arguments
+# (e.g., "build_ext", "-f", "-I/path") when setup() is called
+sys.argv = remaining_argv
+
+if is_api_only:
     # Generate API headers only (no C++ compilation or linking)
     # Used by CMake to generate iobuf_api.h before building folly_python_cpp
     Cython.Compiler.Main.compile(
