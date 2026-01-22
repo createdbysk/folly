@@ -53,7 +53,7 @@ foreach(_src ${BindingFiles})
 endforeach()
 
 # Tell setup.py where to find includes and libfolly.so
-set(prop "$<TARGET_PROPERTY:folly_base,INCLUDE_DIRECTORIES>")
+set(prop "$<TARGET_PROPERTY:folly,INCLUDE_DIRECTORIES>")
 set(incs "$<$<BOOL:${prop}>:-I$<JOIN:${prop},:>>")
 set(glog_lib "${GLOG_LIBRARY}")
 cmake_path(REMOVE_FILENAME glog_lib)
